@@ -14,6 +14,7 @@ import {
   IInterpreterLocatorService,
   KNOWN_PATH_SERVICE,
   PIPENV_SERVICE,
+  POETRY_SERVICE,
   PythonInterpreter,
   WINDOWS_REGISTRY_SERVICE,
   WORKSPACE_VIRTUAL_ENV_SERVICE
@@ -102,6 +103,7 @@ export class PythonInterpreterLocatorService implements IInterpreterLocatorServi
       [WINDOWS_REGISTRY_SERVICE, OSType.Windows],
       [CONDA_ENV_SERVICE, undefined],
       [CONDA_ENV_FILE_SERVICE, undefined],
+      [POETRY_SERVICE, undefined],
       [PIPENV_SERVICE, undefined],
       [GLOBAL_VIRTUAL_ENV_SERVICE, undefined],
       [WORKSPACE_VIRTUAL_ENV_SERVICE, undefined],

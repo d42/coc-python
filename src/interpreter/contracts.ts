@@ -13,6 +13,7 @@ export const KNOWN_PATH_SERVICE = 'KnownPathsService'
 export const GLOBAL_VIRTUAL_ENV_SERVICE = 'VirtualEnvService'
 export const WORKSPACE_VIRTUAL_ENV_SERVICE = 'WorkspaceVirtualEnvService'
 export const PIPENV_SERVICE = 'PipEnvService'
+export const POETRY_SERVICE = 'PoetryService'
 export const IInterpreterVersionService = Symbol('IInterpreterVersionService')
 export interface IInterpreterVersionService {
   getVersion(pythonPath: string, defaultValue: string): Promise<string>
@@ -64,6 +65,7 @@ export enum InterpreterType {
   Conda = 'Conda',
   VirtualEnv = 'VirtualEnv',
   Pipenv = 'PipEnv',
+  Poetry = 'Poetry',
   Pyenv = 'Pyenv',
   Venv = 'Venv'
 }
@@ -111,6 +113,12 @@ export interface IInterpreterHelper {
   isMacDefaultPythonPath(pythonPath: string): Boolean
   getInterpreterTypeDisplayName(interpreterType: InterpreterType): string | undefined
   getBestInterpreter(interpreters?: PythonInterpreter[]): PythonInterpreter | undefined
+}
+
+export const IPoetryService = Symbol('IPoetryService')
+export interface IPoetryService {
+  executable: string
+  isRelatedPoetryEnvironment(dir: string, pythonPath: string): Promise<boolean>
 }
 
 export const IPipEnvService = Symbol('IPipEnvService')

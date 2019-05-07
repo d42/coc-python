@@ -12,7 +12,7 @@ import { ICurrentProcess, IPathUtils } from '../../common/types'
 import { getNamesAndValues } from '../../common/utils/enum'
 import { noop } from '../../common/utils/misc'
 import { IServiceContainer } from '../../ioc/types'
-import { InterpreterType, IPipEnvService } from '../contracts'
+import { InterpreterType, IPipEnvService, IPoetryService} from '../contracts'
 import { IVirtualEnvironmentManager } from './types'
 
 const PYENVFILES = ['pyvenv.cfg', path.join('..', 'pyvenv.cfg')]
@@ -21,6 +21,7 @@ const PYENVFILES = ['pyvenv.cfg', path.join('..', 'pyvenv.cfg')]
 export class VirtualEnvironmentManager implements IVirtualEnvironmentManager {
   private processServiceFactory: IProcessServiceFactory
   private pipEnvService: IPipEnvService
+  private poetryService: IPoetryService
   private fs: IFileSystem
   private pyEnvRoot?: string
   private workspaceService: IWorkspaceService
@@ -28,6 +29,7 @@ export class VirtualEnvironmentManager implements IVirtualEnvironmentManager {
     this.processServiceFactory = serviceContainer.get<IProcessServiceFactory>(IProcessServiceFactory)
     this.fs = serviceContainer.get<IFileSystem>(IFileSystem)
     this.pipEnvService = serviceContainer.get<IPipEnvService>(IPipEnvService)
+    this.poetryService = serviceContainer.get<IPoetryService>(IPoetryService)
     this.workspaceService = serviceContainer.get<IWorkspaceService>(IWorkspaceService)
   }
   public async getEnvironmentName(pythonPath: string, resource?: Uri): Promise<string> {
@@ -37,6 +39,11 @@ export class VirtualEnvironmentManager implements IVirtualEnvironmentManager {
     const grandParentDirName = path.basename(path.dirname(path.dirname(pythonPath)))
     if (workspaceUri && await this.pipEnvService.isRelatedPipEnvironment(Uri.parse(workspaceUri).fsPath, pythonPath)) {
       // In pipenv, return the folder name of the workspace.
+      return path.basename(Uri.parse(workspaceUri).fsPath)
+    }
+
+    if (workspaceUri && await this.poetryService.isRelatedPoetryEnvironment(Uri.parse(workspaceUri).fsPath, pythonPath)) {
+      // In poetry, return the folder name of the workspace.
       return path.basename(Uri.parse(workspaceUri).fsPath)
     }
 
@@ -53,6 +60,10 @@ export class VirtualEnvironmentManager implements IVirtualEnvironmentManager {
 
     if (await this.isPipEnvironment(pythonPath, resource)) {
       return InterpreterType.Pipenv
+    }
+
+    if (await this.isPoetryEnvironment(pythonPath, resource)) {
+      return InterpreterType.Poetry
     }
 
     if (await this.isVirtualEnvironment(pythonPath)) {
@@ -81,6 +92,16 @@ export class VirtualEnvironmentManager implements IVirtualEnvironmentManager {
     const workspaceFolder = resource ? this.workspaceService.getWorkspaceFolder(resource) : undefined
     const workspaceUri = workspaceFolder ? workspaceFolder.uri : defaultWorkspaceUri
     if (workspaceUri && await this.pipEnvService.isRelatedPipEnvironment(Uri.parse(workspaceUri).fsPath, pythonPath)) {
+      return true
+    }
+    return false
+  }
+
+  public async isPoetryEnvironment(pythonPath: string, resource?: Uri) {
+    const defaultWorkspaceUri = this.workspaceService.hasWorkspaceFolders ? this.workspaceService.workspaceFolders![0].uri : undefined
+    const workspaceFolder = resource ? this.workspaceService.getWorkspaceFolder(resource) : undefined
+    const workspaceUri = workspaceFolder ? workspaceFolder.uri : defaultWorkspaceUri
+    if (workspaceUri && await this.poetryService.isRelatedPoetryEnvironment(Uri.parse(workspaceUri).fsPath, pythonPath)) {
       return true
     }
     return false

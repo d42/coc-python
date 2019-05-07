@@ -37,6 +37,7 @@ import { Bash } from './terminal/environmentActivationProviders/bash'
 import { CommandPromptAndPowerShell } from './terminal/environmentActivationProviders/commandPrompt'
 import { CondaActivationCommandProvider } from './terminal/environmentActivationProviders/condaActivationProvider'
 import { PipEnvActivationCommandProvider } from './terminal/environmentActivationProviders/pipEnvActivationProvider'
+import { PoetryActivationCommandProvider } from './terminal/environmentActivationProviders/poetryActivationProvider'
 import { PyEnvActivationCommandProvider } from './terminal/environmentActivationProviders/pyenvActivationProvider'
 import { TerminalServiceFactory } from './terminal/factory'
 import { TerminalHelper } from './terminal/helper'
@@ -101,6 +102,8 @@ export function registerTypes(serviceManager: IServiceManager): void {
     ITerminalActivationCommandProvider, CondaActivationCommandProvider, TerminalActivationProviders.conda)
   serviceManager.addSingleton<ITerminalActivationCommandProvider>(
     ITerminalActivationCommandProvider, PipEnvActivationCommandProvider, TerminalActivationProviders.pipenv)
+  serviceManager.addSingleton<ITerminalActivationCommandProvider>(
+    ITerminalActivationCommandProvider, PoetryActivationCommandProvider, TerminalActivationProviders.poetry)
   serviceManager.addSingleton<IFeatureDeprecationManager>(IFeatureDeprecationManager, FeatureDeprecationManager)
 
   serviceManager.addSingleton<IAsyncDisposableRegistry>(IAsyncDisposableRegistry, AsyncDisposableRegistry)

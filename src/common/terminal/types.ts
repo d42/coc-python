@@ -11,7 +11,8 @@ export enum TerminalActivationProviders {
   commandPromptAndPowerShell = 'commandPromptAndPowerShell',
   pyenv = 'pyenv',
   conda = 'conda',
-  pipenv = 'pipenv'
+  pipenv = 'pipenv',
+  poetry = 'poetry'
 }
 export enum TerminalShellType {
   powershell = 'powershell',

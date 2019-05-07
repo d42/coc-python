@@ -76,6 +76,7 @@ export interface InterpreterInfomation {
   architecture: Architecture
   sysPrefix: string
   pipEnvWorkspaceFolder?: string
+  poetryWorkspaceFolder?: string
 }
 export const IPythonExecutionService = Symbol('IPythonExecutionService')
 

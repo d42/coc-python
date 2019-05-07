@@ -12,7 +12,7 @@ import { IPersistentStateFactory, Resource } from '../../../common/types'
 import { createDeferredFromPromise } from '../../../common/utils/async'
 import { OSType } from '../../../common/utils/platform'
 import { IPythonPathUpdaterServiceManager } from '../../configuration/types'
-import { IInterpreterHelper, IInterpreterLocatorService, PIPENV_SERVICE, PythonInterpreter, WORKSPACE_VIRTUAL_ENV_SERVICE } from '../../contracts'
+import { IInterpreterHelper, IInterpreterLocatorService, PIPENV_SERVICE, POETRY_SERVICE, PythonInterpreter, WORKSPACE_VIRTUAL_ENV_SERVICE } from '../../contracts'
 import { AutoSelectionRule, IInterpreterAutoSelectionService } from '../types'
 import { BaseRuleService, NextAction } from './baseRule'
 
@@ -26,6 +26,7 @@ export class WorkspaceVirtualEnvInterpretersAutoSelectionRule extends BaseRuleSe
     @inject(IWorkspaceService) private readonly workspaceService: IWorkspaceService,
     @inject(IPythonPathUpdaterServiceManager) private readonly pythonPathUpdaterService: IPythonPathUpdaterServiceManager,
     @inject(IInterpreterLocatorService) @named(PIPENV_SERVICE) private readonly pipEnvInterpreterLocator: IInterpreterLocatorService,
+    @inject(IInterpreterLocatorService) @named(POETRY_SERVICE) private readonly poetryInterpreterLocator: IInterpreterLocatorService,
     @inject(IInterpreterLocatorService) @named(WORKSPACE_VIRTUAL_ENV_SERVICE) private readonly workspaceVirtualEnvInterpreterLocator: IInterpreterLocatorService) {
 
     super(AutoSelectionRule.workspaceVirtualEnvs, fs, stateFactory)
@@ -37,19 +38,21 @@ export class WorkspaceVirtualEnvInterpretersAutoSelectionRule extends BaseRuleSe
     }
 
     const pipEnvPromise = createDeferredFromPromise(this.pipEnvInterpreterLocator.getInterpreters(workspacePath.folderUri, true))
+    const poetryPromise = createDeferredFromPromise(this.poetryInterpreterLocator.getInterpreters(workspacePath.folderUri, true))
     const virtualEnvPromise = createDeferredFromPromise(this.getWorkspaceVirtualEnvInterpreters(workspacePath.folderUri))
 
     // Use only one, we currently do not have support for both pipenv and virtual env in same workspace.
     // If users have this, then theu can specify which one is to be used.
-    const interpreters = await Promise.race([pipEnvPromise.promise, virtualEnvPromise.promise])
+    const interpreters = await Promise.race([pipEnvPromise.promise, virtualEnvPromise.promise, poetryPromise.promise])
     let bestInterpreter: PythonInterpreter | undefined
     if (Array.isArray(interpreters) && interpreters.length > 0) {
       bestInterpreter = this.helper.getBestInterpreter(interpreters)
     } else {
-      const [pipEnv, virtualEnv] = await Promise.all([pipEnvPromise.promise, virtualEnvPromise.promise])
+      const [pipEnv, virtualEnv, poetry] = await Promise.all([pipEnvPromise.promise, virtualEnvPromise.promise, poetryPromise.promise])
       const pipEnvList = Array.isArray(pipEnv) ? pipEnv : []
+      const poetryList = Array.isArray(poetry) ? poetry : []
       const virtualEnvList = Array.isArray(virtualEnv) ? virtualEnv : []
-      bestInterpreter = this.helper.getBestInterpreter(pipEnvList.concat(virtualEnvList))
+      bestInterpreter = this.helper.getBestInterpreter(pipEnvList.concat(virtualEnvList).concat(poetryList))
     }
     if (bestInterpreter && manager) {
       await this.cacheSelectedInterpreter(workspacePath.folderUri, bestInterpreter)

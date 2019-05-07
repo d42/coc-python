@@ -47,7 +47,8 @@ export class TerminalHelper implements ITerminalHelper {
     @inject(ITerminalActivationCommandProvider) @named(TerminalActivationProviders.bashCShellFish) private readonly bashCShellFish: ITerminalActivationCommandProvider,
     @inject(ITerminalActivationCommandProvider) @named(TerminalActivationProviders.commandPromptAndPowerShell) private readonly commandPromptAndPowerShell: ITerminalActivationCommandProvider,
     @inject(ITerminalActivationCommandProvider) @named(TerminalActivationProviders.pyenv) private readonly pyenv: ITerminalActivationCommandProvider,
-    @inject(ITerminalActivationCommandProvider) @named(TerminalActivationProviders.pipenv) private readonly pipenv: ITerminalActivationCommandProvider
+    @inject(ITerminalActivationCommandProvider) @named(TerminalActivationProviders.pipenv) private readonly pipenv: ITerminalActivationCommandProvider,
+    @inject(ITerminalActivationCommandProvider) @named(TerminalActivationProviders.poetry) private readonly poetry: ITerminalActivationCommandProvider
   ) {
     this.detectableShells = new Map<TerminalShellType, RegExp>()
     this.detectableShells.set(TerminalShellType.powershell, IS_POWERSHELL)
@@ -103,7 +104,7 @@ export class TerminalHelper implements ITerminalHelper {
     return `${commandPrefix}${fileToCommandArgument(command)} ${args.join(' ')}`.trim()
   }
   public async getEnvironmentActivationCommands(terminalShellType: TerminalShellType, resource?: Uri): Promise<string[] | undefined> {
-    const providers = [this.pipenv, this.pyenv, this.bashCShellFish, this.commandPromptAndPowerShell]
+    const providers = [this.pipenv, this.pyenv, this.poetry, this.bashCShellFish, this.commandPromptAndPowerShell]
     const promise = this.getActivationCommands(resource || undefined, undefined, terminalShellType, providers)
     return promise
   }

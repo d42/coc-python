@@ -38,10 +38,12 @@ import {
   INTERPRETER_LOCATOR_SERVICE,
   InterpreterLocatorProgressHandler,
   IPipEnvService,
+  IPoetryService,
   IShebangCodeLensProvider,
   IVirtualEnvironmentsSearchPathProvider,
   KNOWN_PATH_SERVICE,
   PIPENV_SERVICE,
+  POETRY_SERVICE,
   WINDOWS_REGISTRY_SERVICE,
   WORKSPACE_VIRTUAL_ENV_SERVICE
 } from './contracts'
@@ -62,6 +64,7 @@ import { GlobalVirtualEnvironmentsSearchPathProvider, GlobalVirtualEnvService } 
 import { InterpreterWatcherBuilder } from './locators/services/interpreterWatcherBuilder'
 import { KnownPathsService, KnownSearchPathsForInterpreters } from './locators/services/KnownPathsService'
 import { PipEnvService } from './locators/services/pipEnvService'
+import { PoetryService } from './locators/services/poetryService'
 import { PipEnvServiceHelper } from './locators/services/pipEnvServiceHelper'
 import { WindowsRegistryService } from './locators/services/windowsRegistryService'
 import { WorkspaceVirtualEnvironmentsSearchPathProvider, WorkspaceVirtualEnvService } from './locators/services/workspaceVirtualEnvService'
@@ -91,6 +94,8 @@ export function registerTypes(serviceManager: IServiceManager) {
   serviceManager.addSingleton<IInterpreterLocatorService>(IInterpreterLocatorService, GlobalVirtualEnvService, GLOBAL_VIRTUAL_ENV_SERVICE)
   serviceManager.addSingleton<IInterpreterLocatorService>(IInterpreterLocatorService, WorkspaceVirtualEnvService, WORKSPACE_VIRTUAL_ENV_SERVICE)
   serviceManager.addSingleton<IInterpreterLocatorService>(IInterpreterLocatorService, PipEnvService, PIPENV_SERVICE)
+  serviceManager.addSingleton<IInterpreterLocatorService>(IInterpreterLocatorService, PoetryService, POETRY_SERVICE)
+  serviceManager.addSingleton<IInterpreterLocatorService>(IPoetryService, PoetryService)
   serviceManager.addSingleton<IInterpreterLocatorService>(IPipEnvService, PipEnvService)
 
   serviceManager.addSingleton<IInterpreterLocatorService>(IInterpreterLocatorService, WindowsRegistryService, WINDOWS_REGISTRY_SERVICE)
